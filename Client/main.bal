@@ -33,7 +33,7 @@ public function main()returns error? {
     if keyword=="add"{
 
     } else if keyword == "showall"{
-
+        check getStaff(UserClient);
     } else if keyword == "update"{
 
     } else if keyword == "delete"{
@@ -47,12 +47,12 @@ public function main()returns error? {
     } else {
 
     }
-    http:Response res=new;
-    Lecturer staffRecord = check UserClient ->/staffRecordTable.post(io:readln(Lecturer));
-    io:println("Lecturer Has been add"+staffRecord.toJsonString());
-    
-    Lecturer[] staffRecords = check UserClient ->/staffRecordTable.get;
-    io:println("Get All Lecturers" + staffRecords.toJsonString());
-
-    io:println("Hello, World!");
+};
+public function getStaff(http:Client http) returns error?{
+    if (http is http:Client){
+        Lecturer[] lecturer=check http->/getStaffMembers;
+        foreach Lecturer item in lecturer{
+            io:println("Staff No: ",item.Staff_No,"Staff Name: ",item.Staff_Name,"Office No",item.Office_No,"CourseName",item.CoursesName);
+        }
+    }
 }
