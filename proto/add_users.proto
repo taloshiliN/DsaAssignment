@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package clients;
+
+service BookService {
+    rpc create(CreateBookRequest) returns(CreateBookResponse);
+}
+
+message CreateNewUserRequest {
+    int32 user_id = 1;
+    string user_name = 2;
+}
+
+message CreateNewUserResponse {
+    string user_name = 1;
+}
