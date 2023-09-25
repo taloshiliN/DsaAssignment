@@ -1,0 +1,45 @@
+syntax = "proto3";
+package LibraryManagement;
+
+service LibraryManagement {
+    rpc addBook(BookDetails) returns (ISBN);
+    rpc updateBook(BookDetails) returns (Response);
+    rpc removeBook(BookDetails) returns (BookDetails);
+    rpc listAvailableBooks(BookDetails) returns (ListAvailableBooks);
+    rpc createUsers(UserDetails) returns (Response);
+    rpc locateBook(ISBN) returns (BookDetails);
+    rpc borrowBook(BookOnLoan) returns (Response);
+}
+
+message BookDetails {
+    string title = 1;
+    string authors = 2;
+    string location = 3;
+    int64 isbn = 4;
+    string status = 5;
+}
+message ISBN {
+    int64 isbn = 1;
+}
+message Book {
+    string bookName = 1;
+}
+message UserDetails {
+    string userFirstName = 1;
+    string userLastName = 2;
+    int64 userID = 3;
+    string userGender = 4;
+}
+message Response {
+    string message = 1;
+}
+message BookList {
+    string allBooks = 1;
+}
+message ListAvailableBooks {
+    string availableBooks = 1;
+}
+message BookOnLoan {
+    int64 userID = 1;
+    int64 isbn = 2;
+}
