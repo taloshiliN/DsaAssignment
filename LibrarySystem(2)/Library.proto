@@ -1,0 +1,47 @@
+syntax = "proto3";
+package LibraryManagement;
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service LibraryManagement {
+    rpc addBook(BookDetails) returns (Response);
+    rpc updateBook(BookDetails) returns (Response);
+    rpc removeBook(BookDetails) returns (Response);
+    rpc listAvailableBooks(google.protobuf.Empty) returns (ListAvailableBooks);
+    rpc createUsers(stream UserDetails) returns (Response);
+    rpc locateBook(BookDetails) returns (BookLocation);
+    rpc borrowBook(BookOnLoan) returns (Response);
+}
+
+message BookDetails {
+    string title = 1;
+    string authors = 2;
+    string location = 3;
+    string isbn = 4;
+    string status = 5;
+}
+message ISBN {
+    string isbn = 1;
+}
+message BookLocation {
+    string bookName = 1;
+}
+message UserDetails {
+    string userFirstName = 1;
+    string userLastName = 2;
+    string userID = 3;
+    string userGender = 4;
+}
+message Response {
+    string message = 1;
+}
+message BookList {
+    string allBooks = 1;
+}
+message ListAvailableBooks {
+    string availableBooks = 1;
+}
+message BookOnLoan {
+    string userID = 1;
+    string isbn = 2;
+}
