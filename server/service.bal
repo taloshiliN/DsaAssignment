@@ -1,10 +1,11 @@
 import ballerina/http;
+import ballerina/io;
 
 type Lecturer record{
-    readonly int Staff_No;
+    readonly string Staff_No;
     string Staff_Name;
-    int Office_No;
-    string[] CoursesName;
+    string Office_No;
+    string CoursesName;
 };
 
 type Course readonly & record{
@@ -12,45 +13,70 @@ type Course readonly & record{
     string CourseName;
     int NQF;
 };
-
-Lecturer[] staffRecords=[];
+//Value for searches
+type staff_num string;
+type OfficeNo string;
+type CourseName string;
+table <Lecturer>key(Staff_No) staffRecordsTable=table[
+    {Staff_No: "1",Staff_Name: "Talo",Office_No: "23",CoursesName: "Programming"},
+    {Staff_No: "2",Staff_Name: "Olat",Office_No: "24",CoursesName: "Data Structures"},
+    {Staff_No: "3",Staff_Name: "Lolina",Office_No: "26",CoursesName: "Intro to Computing"},
+    {Staff_No: "4",Staff_Name: "John",Office_No: "27",CoursesName: "Archaetecture"}
+];
 service /Staff on new http:Listener(9090) {
-    resource function post addLecturer(Lecturer lecturer) returns Lecturer|error {
-        return lecturer;   
+    resource function get getStaffMembers() returns table <Lecturer>key(Staff_No){
+        return staffRecordsTable;
     }
-    resource function get allLecturer()returns Lecturer|error{
-        Lecturer lecturer={Staff_No: 1,Staff_Name: "Thomas Kenedy",Office_No: 32,CoursesName: ["Data Structures"]};
-        return lecturer; //Part is fine for now
-    }
-    resource function put updateLecturerRecord(int Staff_No, Lecturer updatedRecords) returns string|error{
-        int UpdatedRow=updateLecturerRecord(Staff_No,updatedRecords);
-
-        if (UpdatedRow==1){
-            return "Lecturer was updated";
-        } else{
-            return error ("Failed to update");
-        } //Part is find for now
-    }
-    resource function get LecturerRecordsBy(int Staff_No) returns Lecturer|error{
-        Lecturer lecturer={Staff_No: 2,Staff_Name: "William Conor",Office_No: 34,CoursesName: ["Mathematics"]};
-        return lecturer; //re-do this part
-    }
-    resource function delete LecturerRecordsBy(int Staff_No) returns string|error{
-        int index=FindLecturerBystaffno(Staff_No);
-
-        if(index==-1){
-            return error ("Lecturer Not Found");
+    resource function post addstaffRecord(Lecturer staffRecord) returns string{
+        io:println(staffRecord);
+        error? err=staffRecordsTable.add(staffRecord);
+        if (err is error){
+            return string `error, ${err.message()}`;
         }
-        staffRecords.remove(index);
-
-        return "Employee Deleted Successfully";
+        return string `${staffRecord.Staff_No} saved successfully`;
     }
-    resource function get LecturerByCourseName(string[] CourseName) returns Lecturer|error{
-        Lecturer lecturer={Staff_No: 3,Staff_Name:"Johnson Jon",Office_No: 32,CoursesName: ["Programming"]};
-        return lecturer;
+    resource function delete ByStaffNo/[string staff_num]() returns string{
+        staffRecordsTable=<table<Lecturer>key(Staff_No)>staffRecordsTable.filter((staffRecord)=>staffRecord.Staff_No != staff_num);
+        table<Lecturer> staffRecordsTable2=table[];
+        if (staffRecordsTable.length()===staffRecordsTable2.length()){
+                    return staff_num + " not found.";
+        }
+        return staff_num + " successfuly deleted";
     }
-    resource function get LecturerByOfficeNo(int Office_No) returns Lecturer|error{
-        Lecturer lecturer={Staff_No: 4,Staff_Name:"Ross Lynch",Office_No: 67,CoursesName: ["intro to Computing"]};
-        return lecturer;
+    //get staff members by staffNo
+    resource function get ByStaffNo/[string staff_num]() returns Lecturer|string{
+        foreach Lecturer lecturer in staffRecordsTable{
+            if(lecturer.Staff_No===staff_num){
+                return lecturer;
+            }
+        }
+        return staff_num + "Does not exist";
+    }
+    //get staff members by coursename
+    resource function get ByCourseName(string CoursesName) returns Lecturer|string{
+        foreach Lecturer lecturer in staffRecordsTable{
+            if(lecturer.CoursesName===CoursesName){
+                return lecturer;
+            }
+        }
+        return CoursesName + "Does not exist";
+    }
+    //get staff members by officeno
+    resource function get ByOfficeNo(string OfficeNo) returns Lecturer|string{
+        foreach Lecturer lecturer in staffRecordsTable{
+            if(lecturer.Office_No===OfficeNo){
+                return lecturer;
+            }
+        }
+        return OfficeNo + "Does not exist";
+    }
+    //update staff members record
+    resource function put updateStaffMembers(Lecturer lecturer)returns string{
+        io:println(lecturer);
+        error? err=staffRecordsTable.put(lecturer);
+        if(err is error){
+            return string `Error,${err.message()}`;
+        }
+        return string `Error,${lecturer.Staff_No} saved successfully`;
     }
 }
